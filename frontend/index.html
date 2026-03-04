@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobTrack – Job Application Tracker</title>
+    <meta name="description" content="Track your job applications with a modern Kanban-style dashboard. Organize interviews, offers, and more.">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header" id="header">
+        <div class="header-left">
+            <div class="logo">
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M8 12l2 2 4-4"/>
+                </svg>
+                <span class="logo-text">JobTrack</span>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="search-box">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <input type="text" id="searchInput" placeholder="Search jobs..." autocomplete="off">
+            </div>
+            <button class="icon-btn" id="darkModeToggle" title="Toggle dark mode">
+                <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </button>
+            <button class="icon-btn" id="notifBtn" title="Notifications">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            </button>
+            <button class="icon-btn" id="settingsBtn" title="Settings">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Stats Cards -->
+    <section class="stats-bar" id="statsBar">
+        <div class="stat-card stat-applications">
+            <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v3"/></svg>
+            </div>
+            <span class="stat-label">Applications</span>
+            <span class="stat-value" id="statApplications">0</span>
+        </div>
+        <div class="stat-card stat-interviews">
+            <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v3"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+            </div>
+            <span class="stat-label">Interviews</span>
+            <span class="stat-value" id="statInterviews">0</span>
+        </div>
+        <div class="stat-card stat-offers">
+            <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <span class="stat-label">Offers</span>
+            <span class="stat-value" id="statOffers">0</span>
+        </div>
+        <div class="stat-card stat-add">
+            <button class="btn-add-job" id="addJobBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Add Job
+            </button>
+        </div>
+    </section>
+
+    <!-- Kanban Board -->
+    <main class="board-container">
+        <h2 class="board-title">Dashboard</h2>
+        <div class="kanban-board" id="kanbanBoard">
+            <div class="kanban-column" data-status="applied">
+                <div class="column-header">
+                    <span class="column-drag-handle">⠿</span>
+                    <h3>Applied</h3>
+                    <span class="column-count" id="countApplied">0</span>
+                    <svg class="column-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+                <div class="column-cards" id="colApplied"></div>
+            </div>
+            <div class="kanban-column" data-status="interview">
+                <div class="column-header">
+                    <span class="column-drag-handle">⠿</span>
+                    <h3>Interview</h3>
+                    <span class="column-count" id="countInterview">0</span>
+                    <svg class="column-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+                <div class="column-cards" id="colInterview"></div>
+            </div>
+            <div class="kanban-column" data-status="offer">
+                <div class="column-header">
+                    <span class="column-drag-handle">⠿</span>
+                    <h3>Offer</h3>
+                    <span class="column-count" id="countOffer">0</span>
+                    <svg class="column-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+                <div class="column-cards" id="colOffer"></div>
+            </div>
+            <div class="kanban-column" data-status="rejected">
+                <div class="column-header">
+                    <span class="column-drag-handle">⠿</span>
+                    <h3>Rejected</h3>
+                    <span class="column-count" id="countRejected">0</span>
+                    <svg class="column-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+                <div class="column-cards" id="colRejected"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add/Edit Job Modal -->
+    <div class="modal-overlay" id="jobModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add New Job</h3>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <form id="jobForm" class="modal-form">
+                <input type="hidden" id="jobId">
+                <div class="form-group">
+                    <label for="jobCompany">Company *</label>
+                    <input type="text" id="jobCompany" required placeholder="e.g. Google">
+                </div>
+                <div class="form-group">
+                    <label for="jobTitle">Job Title *</label>
+                    <input type="text" id="jobTitle" required placeholder="e.g. Front-End Developer">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="jobLocation">Location</label>
+                        <input type="text" id="jobLocation" placeholder="e.g. California">
+                    </div>
+                    <div class="form-group">
+                        <label for="jobStatus">Status</label>
+                        <select id="jobStatus">
+                            <option value="applied">Applied</option>
+                            <option value="interview">Interview</option>
+                            <option value="offer">Offer</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="jobUrl">Job URL</label>
+                    <input type="url" id="jobUrl" placeholder="https://...">
+                </div>
+                <div class="form-group">
+                    <label for="jobNotes">Notes</label>
+                    <textarea id="jobNotes" rows="3" placeholder="Interview details, contact info..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="modalCancel">Cancel</button>
+                    <button type="submit" class="btn-primary" id="modalSubmit">Save Job</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal modal-small">
+            <div class="modal-header">
+                <h3>Delete Job</h3>
+                <button class="modal-close" id="deleteModalClose">&times;</button>
+            </div>
+            <p class="delete-msg">Are you sure you want to delete this job application? This action cannot be undone.</p>
+            <div class="form-actions">
+                <button class="btn-secondary" id="deleteCancelBtn">Cancel</button>
+                <button class="btn-danger" id="deleteConfirmBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/kanban.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
