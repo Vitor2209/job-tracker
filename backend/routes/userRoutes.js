@@ -2,9 +2,8 @@ const express = require("express")
 const router = express.Router()
 
 const authMiddleware = require("../middleware/authMiddleware")
-const { createJob, getJobs } = require("../controllers/jobController")
+const { getUserProfile } = require("../controllers/userController")
 
-router.post("/", authMiddleware, createJob)
-router.get("/", authMiddleware, getJobs)
+router.get("/me", authMiddleware, getUserProfile)
 
 module.exports = router
