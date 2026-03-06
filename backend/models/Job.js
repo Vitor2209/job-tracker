@@ -2,12 +2,6 @@ const mongoose = require("mongoose")
 
 const JobSchema = new mongoose.Schema({
 
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true
-  },
-
   company: {
     type: String,
     required: true
@@ -20,12 +14,19 @@ const JobSchema = new mongoose.Schema({
 
   status: {
     type: String,
-    enum: ["applied", "interview", "offer", "rejected"],
-    default: "applied"
+    enum: ["Applied", "Interview", "Rejected", "Offer"],
+    default: "Applied"
   },
 
-  notes: {
-    type: String
+  location: {
+    type: String,
+    default: "Remote"
+  },
+
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true
   },
 
   createdAt: {

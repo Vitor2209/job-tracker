@@ -1,10 +1,33 @@
 const express = require("express")
 const router = express.Router()
 
-const authMiddleware = require("../middleware/authMiddleware")
-const { createJob, getJobs } = require("../controllers/jobController")
+const {
+  createJob,
+  getJobs,
+  updateJob,
+  deleteJob,
+  getJobStats,
+  getMonthlyStats
+} = require("../controllers/jobController")
 
-router.post("/", authMiddleware, createJob)
+const authMiddleware = require("../middleware/authMiddleware")
+
+// LISTAR TODAS AS VAGAS
 router.get("/", authMiddleware, getJobs)
+
+// CRIAR NOVA VAGA
+router.post("/", authMiddleware, createJob)
+
+// ESTATÍSTICAS DO DASHBOARD
+router.get("/stats", authMiddleware, getJobStats)
+
+// ESTATÍSTICAS MENSAIS (para gráficos)
+router.get("/monthly-stats", authMiddleware, getMonthlyStats)
+
+// ATUALIZAR VAGA
+router.patch("/:id", authMiddleware, updateJob)
+
+// DELETAR VAGA
+router.delete("/:id", authMiddleware, deleteJob)
 
 module.exports = router
