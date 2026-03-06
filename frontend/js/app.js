@@ -1,158 +1,262 @@
 /**
- * JobTrack – Main Application
- * Orchestrates all modules
- */
+
+* JobTrack – Main Application
+* Orchestrates all modules
+  */
 
 const App = {
-    deleteTargetId: null,
-    searchQuery: '',
 
-    /** Initialize the application */
-    async init() {
-        // Seed sample data on first load
-        Storage.seed();
+deleteTargetId: null,
+searchQuery: "",
 
-        // Initialize kanban drag-and-drop
-        Kanban.init();
+// ============================
+// INIT
+// ============================
+async init() {
 
-        // Load theme preference
-        this.loadTheme();
+    // inicializar kanban
+    Kanban.init()
 
-        // Bind UI events
-        this.bindEvents();
+    // carregar tema salvo
+    this.loadTheme()
 
-        // Initial render
-        await this.renderBoard();
-    },
+    // eventos da interface
+    this.bindEvents()
 
-    /** Bind all event listeners */
-    bindEvents() {
-        // Add Job button
-        document.getElementById('addJobBtn').addEventListener('click', () => {
-            UI.resetForm();
-            UI.showModal('jobModal');
-        });
+    // render inicial
+    await this.renderBoard()
 
-        // Modal close/cancel
-        document.getElementById('modalClose').addEventListener('click', () => UI.hideModal('jobModal'));
-        document.getElementById('modalCancel').addEventListener('click', () => UI.hideModal('jobModal'));
+},
 
-        // Form submit
-        document.getElementById('jobForm').addEventListener('submit', (e) => this.handleFormSubmit(e));
+// ============================
+// EVENTOS
+// ============================
+bindEvents() {
 
-        // Delete modal
-        document.getElementById('deleteModalClose').addEventListener('click', () => UI.hideModal('deleteModal'));
-        document.getElementById('deleteCancelBtn').addEventListener('click', () => UI.hideModal('deleteModal'));
-        document.getElementById('deleteConfirmBtn').addEventListener('click', () => this.handleDelete());
+    // botão adicionar vaga
+    const addBtn = document.getElementById("addJobBtn")
+    if (addBtn) {
+        addBtn.addEventListener("click", () => {
+            UI.resetForm()
+            UI.showModal("jobModal")
+        })
+    }
 
-        // Dark mode toggle
-        document.getElementById('darkModeToggle').addEventListener('click', () => this.toggleTheme());
+    // fechar modal
+    const modalClose = document.getElementById("modalClose")
+    if (modalClose) {
+        modalClose.addEventListener("click", () => UI.hideModal("jobModal"))
+    }
 
-        // Search
-        document.getElementById('searchInput').addEventListener('input', (e) => {
-            this.searchQuery = e.target.value.toLowerCase();
-            this.renderBoard();
-        });
+    const modalCancel = document.getElementById("modalCancel")
+    if (modalCancel) {
+        modalCancel.addEventListener("click", () => UI.hideModal("jobModal"))
+    }
 
-        // Close modals on backdrop click
-        document.querySelectorAll('.modal-overlay').forEach(overlay => {
-            overlay.addEventListener('click', (e) => {
-                if (e.target === overlay) overlay.classList.remove('active');
-            });
-        });
+    // submit do formulário
+    const form = document.getElementById("jobForm")
+    if (form) {
+        form.addEventListener("submit", (e) => this.handleFormSubmit(e))
+    }
 
-        // Keyboard: Escape to close modals
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
+    // delete modal
+    const deleteClose = document.getElementById("deleteModalClose")
+    if (deleteClose) {
+        deleteClose.addEventListener("click", () => UI.hideModal("deleteModal"))
+    }
+
+    const deleteCancel = document.getElementById("deleteCancelBtn")
+    if (deleteCancel) {
+        deleteCancel.addEventListener("click", () => UI.hideModal("deleteModal"))
+    }
+
+    const deleteConfirm = document.getElementById("deleteConfirmBtn")
+    if (deleteConfirm) {
+        deleteConfirm.addEventListener("click", () => this.handleDelete())
+    }
+
+    // dark mode
+    const darkToggle = document.getElementById("darkModeToggle")
+    if (darkToggle) {
+        darkToggle.addEventListener("click", () => this.toggleTheme())
+    }
+
+    // search
+    const search = document.getElementById("searchInput")
+    if (search) {
+        search.addEventListener("input", (e) => {
+            this.searchQuery = e.target.value.toLowerCase()
+            this.renderBoard()
+        })
+    }
+
+    // fechar modal clicando fora
+    document.querySelectorAll(".modal-overlay").forEach(overlay => {
+        overlay.addEventListener("click", (e) => {
+            if (e.target === overlay) {
+                overlay.classList.remove("active")
             }
-        });
-    },
+        })
+    })
 
-    /** Render the entire board */
-    async renderBoard() {
-        let jobs = await API.getJobs();
+    // ESC fecha modais
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+            document.querySelectorAll(".modal-overlay.active")
+                .forEach(m => m.classList.remove("active"))
+        }
+    })
 
-        // Apply search filter
+},
+
+// ============================
+// RENDER BOARD
+// ============================
+async renderBoard() {
+
+    try {
+
+        let jobs = await API.getJobs()
+
+        if (!Array.isArray(jobs)) {
+            jobs = jobs.jobs || []
+        }
+
         if (this.searchQuery) {
             jobs = jobs.filter(j =>
-                j.company.toLowerCase().includes(this.searchQuery) ||
-                j.title.toLowerCase().includes(this.searchQuery) ||
-                (j.location && j.location.toLowerCase().includes(this.searchQuery))
-            );
+                j.company?.toLowerCase().includes(this.searchQuery) ||
+                j.position?.toLowerCase().includes(this.searchQuery) ||
+                j.location?.toLowerCase().includes(this.searchQuery)
+            )
         }
 
-        UI.renderBoard(jobs);
+        UI.renderBoard(jobs)
 
-        // Stats always use full dataset
-        const stats = await API.getStats();
-        UI.renderStats(stats);
-    },
+        const stats = await API.getStats()
+        UI.renderStats(stats)
 
-    /** Handle form submission (create or update) */
-    async handleFormSubmit(e) {
-        e.preventDefault();
+    } catch (error) {
 
-        const id = document.getElementById('jobId').value;
-        const data = {
-            company: document.getElementById('jobCompany').value.trim(),
-            title: document.getElementById('jobTitle').value.trim(),
-            location: document.getElementById('jobLocation').value.trim(),
-            status: document.getElementById('jobStatus').value,
-            url: document.getElementById('jobUrl').value.trim(),
-            notes: document.getElementById('jobNotes').value.trim(),
-            date: new Date().toISOString().split('T')[0],
-        };
+        console.error("Render error:", error)
 
-        if (!data.company || !data.title) return;
+    }
+
+},
+
+// ============================
+// SUBMIT FORM
+// ============================
+async handleFormSubmit(e) {
+
+    e.preventDefault()
+
+    const id = document.getElementById("jobId").value
+
+    const data = {
+        company: document.getElementById("jobCompany").value.trim(),
+        position: document.getElementById("jobTitle").value.trim(),
+        location: document.getElementById("jobLocation").value.trim(),
+        status: document.getElementById("jobStatus").value,
+        url: document.getElementById("jobUrl").value.trim(),
+        notes: document.getElementById("jobNotes").value.trim()
+    }
+
+    if (!data.company || !data.position) return
+
+    try {
 
         if (id) {
-            await API.updateJob(id, data);
+            await API.updateJob(id, data)
         } else {
-            await API.createJob(data);
+            await API.createJob(data)
         }
 
-        UI.hideModal('jobModal');
-        await this.renderBoard();
-    },
+        UI.hideModal("jobModal")
 
-    /** Open edit modal for a job */
-    async openEditModal(id) {
-        const jobs = await API.getJobs();
-        const job = jobs.find(j => j.id === id);
-        if (!job) return;
-        UI.populateForm(job);
-        UI.showModal('jobModal');
-    },
+        await this.renderBoard()
 
-    /** Open delete confirmation */
-    openDeleteModal(id) {
-        this.deleteTargetId = id;
-        UI.showModal('deleteModal');
-    },
+    } catch (error) {
 
-    /** Confirm delete */
-    async handleDelete() {
-        if (!this.deleteTargetId) return;
-        await API.deleteJob(this.deleteTargetId);
-        this.deleteTargetId = null;
-        UI.hideModal('deleteModal');
-        await this.renderBoard();
-    },
+        console.error("Submit error:", error)
 
-    /** Theme management */
-    loadTheme() {
-        const saved = localStorage.getItem('jobtrack_theme') || 'dark';
-        document.documentElement.setAttribute('data-theme', saved);
-    },
-
-    toggleTheme() {
-        const current = document.documentElement.getAttribute('data-theme');
-        const next = current === 'dark' ? 'light' : 'dark';
-        document.documentElement.setAttribute('data-theme', next);
-        localStorage.setItem('jobtrack_theme', next);
     }
-};
 
-// Boot
-document.addEventListener('DOMContentLoaded', () => App.init());
+},
+
+// ============================
+// EDIT JOB
+// ============================
+async openEditModal(id) {
+
+    const jobs = await API.getJobs()
+
+    const list = Array.isArray(jobs) ? jobs : jobs.jobs
+
+    const job = list.find(j => j._id === id)
+
+    if (!job) return
+
+    UI.populateForm(job)
+
+    UI.showModal("jobModal")
+
+},
+
+// ============================
+// DELETE JOB
+// ============================
+openDeleteModal(id) {
+
+    this.deleteTargetId = id
+
+    UI.showModal("deleteModal")
+
+},
+
+async handleDelete() {
+
+    if (!this.deleteTargetId) return
+
+    await API.deleteJob(this.deleteTargetId)
+
+    this.deleteTargetId = null
+
+    UI.hideModal("deleteModal")
+
+    await this.renderBoard()
+
+},
+
+// ============================
+// THEME
+// ============================
+loadTheme() {
+
+    const saved = localStorage.getItem("jobtrack_theme") || "dark"
+
+    document.documentElement.setAttribute("data-theme", saved)
+
+},
+
+toggleTheme() {
+
+    const current = document.documentElement.getAttribute("data-theme")
+
+    const next = current === "dark" ? "light" : "dark"
+
+    document.documentElement.setAttribute("data-theme", next)
+
+    localStorage.setItem("jobtrack_theme", next)
+
+}
+
+
+}
+
+// ============================
+// BOOT
+// ============================
+document.addEventListener("DOMContentLoaded", () => {
+App.init()
+})
+

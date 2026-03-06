@@ -1,54 +1,104 @@
 /**
  * JobTrack – API Layer
- * Mock API that wraps Storage.
- * 
- * To connect to a real backend, replace the body of each function
- * with fetch() calls to your Express API:
- *   GET    /api/jobs
- *   POST   /api/jobs
- *   PUT    /api/jobs/:id
- *   DELETE /api/jobs/:id
+ * Connects frontend to Express backend
  */
 
+const API_URL = "http://localhost:5000/api"
+
+// COLE AQUI O TOKEN QUE VOCE PEGOU NO THUNDER CLIENT
+const TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YTk5ZTU4NWIxYTgxZWI3YmZkMzcwMiIsImlhdCI6MTc3MjgwODg0MiwiZXhwIjoxNzczNDEzNjQyfQ.l64PvBhbV43usmm8AxoXFuamf3Q36svFGUkuM4hLr5o"
+
 const API = {
-    /** Simulate async delay */
-    _delay(ms = 50) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    },
 
-    /** GET /api/jobs */
+    // =============================
+    // GET ALL JOBS
+    // =============================
+
     async getJobs() {
-        await this._delay();
-        return Storage.getAll();
+
+        const res = await fetch(`${API_URL}/jobs`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${TOKEN}`
+            }
+        })
+
+        const data = await res.json()
+
+        return data.jobs
+
     },
 
-    /** POST /api/jobs */
-    async createJob(data) {
-        await this._delay();
-        return Storage.create(data);
+    // =============================
+    // CREATE JOB
+    // =============================
+
+    async createJob(jobData) {
+
+        const res = await fetch(`${API_URL}/jobs`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${TOKEN}`
+            },
+            body: JSON.stringify(jobData)
+        })
+
+        return res.json()
+
     },
 
-    /** PUT /api/jobs/:id */
-    async updateJob(id, data) {
-        await this._delay();
-        return Storage.update(id, data);
+    // =============================
+    // UPDATE JOB
+    // =============================
+
+    async updateJob(id, jobData) {
+
+        const res = await fetch(`${API_URL}/jobs/${id}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${TOKEN}`
+            },
+            body: JSON.stringify(jobData)
+        })
+
+        return res.json()
+
     },
 
-    /** DELETE /api/jobs/:id */
+    // =============================
+    // DELETE JOB
+    // =============================
+
     async deleteJob(id) {
-        await this._delay();
-        Storage.delete(id);
-        return { success: true };
+
+        const res = await fetch(`${API_URL}/jobs/${id}`, {
+            method: "DELETE",
+            headers: {
+                "Authorization": `Bearer ${TOKEN}`
+            }
+        })
+
+        return res.json()
+
     },
 
-    /** GET /api/jobs/stats */
+    // =============================
+    // GET STATS
+    // =============================
+
     async getStats() {
-        const jobs = await this.getJobs();
-        return {
-            applications: jobs.length,
-            interviews: jobs.filter(j => j.status === 'interview').length,
-            offers: jobs.filter(j => j.status === 'offer').length,
-            rejected: jobs.filter(j => j.status === 'rejected').length,
-        };
+
+        const res = await fetch(`${API_URL}/jobs/stats`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${TOKEN}`
+            }
+        })
+
+        return res.json()
+
     }
-};
+
+}

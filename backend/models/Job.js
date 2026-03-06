@@ -2,38 +2,33 @@ const mongoose = require("mongoose")
 
 const JobSchema = new mongoose.Schema({
 
-  company: {
-    type: String,
-    required: true
-  },
+company: {
+type: String,
+required: true
+},
 
-  position: {
-    type: String,
-    required: true
-  },
+position: {
+type: String,
+required: true
+},
 
-  status: {
-    type: String,
-    enum: ["Applied", "Interview", "Rejected", "Offer"],
-    default: "Applied"
-  },
+location: {
+type: String,
+default: ""
+},
 
-  location: {
-    type: String,
-    default: "Remote"
-  },
+status: {
+type: String,
+enum: ["applied", "interview", "offer", "rejected"],
+default: "applied"
+},
 
-  createdBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true
-  },
+createdBy: {
+type: mongoose.Schema.Types.ObjectId,
+ref: "User",
+required: true
+}
 
-  createdAt: {
-    type: Date,
-    default: Date.now
-  }
-
-})
+}, { timestamps: true })
 
 module.exports = mongoose.model("Job", JobSchema)

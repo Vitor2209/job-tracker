@@ -1,98 +1,104 @@
 const Job = require("../models/Job")
-const mongoose = require("mongoose")
 
+// ============================
 // CREATE JOB
+// ============================
 exports.createJob = async (req, res) => {
-
   try {
 
-    const { company, position, status } = req.body
+    const { company, position, location, status } = req.body
 
-    const job = await Job.create({
-      company,
-      position,
-      status,
+    const job = new Job({
+      company: company,
+      position: position,
+      location: location,
+      status: status,
       createdBy: req.user.id
     })
 
-    res.status(201).json({
-      job
-    })
+    const savedJob = await job.save()
+
+    res.status(201).json(savedJob)
 
   } catch (error) {
+
+    console.log("CREATE JOB ERROR:", error)
 
     res.status(500).json({
       message: error.message
     })
 
   }
-
 }
 
 
-
-// GET ALL JOBS (FILTER + SEARCH + PAGINATION)
+// ============================
+// GET ALL JOBS
+// ============================
 exports.getJobs = async (req, res) => {
-
   try {
 
-    const { status, search, page = 1, limit = 10 } = req.query
-
-    const queryObject = {
+    const jobs = await Job.find({
       createdBy: req.user.id
-    }
-
-    // filtro por status
-    if (status && status !== "all") {
-      queryObject.status = status
-    }
-
-    // busca por empresa ou posição
-    if (search) {
-      queryObject.$or = [
-        { company: { $regex: search, $options: "i" } },
-        { position: { $regex: search, $options: "i" } }
-      ]
-    }
-
-    const skip = (page - 1) * limit
-
-    const jobs = await Job.find(queryObject)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(Number(limit))
-
-    const totalJobs = await Job.countDocuments(queryObject)
+    }).sort({ createdAt: -1 })
 
     res.status(200).json({
-      totalJobs,
-      numOfPages: Math.ceil(totalJobs / limit),
-      currentPage: Number(page),
+      count: jobs.length,
       jobs
     })
 
   } catch (error) {
 
+    console.error("GET JOBS ERROR:", error)
+
     res.status(500).json({
       message: error.message
     })
 
   }
-
 }
 
 
-
-// UPDATE JOB
-exports.updateJob = async (req, res) => {
-
+// ============================
+// GET SINGLE JOB
+// ============================
+exports.getJob = async (req, res) => {
   try {
 
-    const { id } = req.params
+    const job = await Job.findOne({
+      _id: req.params.id,
+      createdBy: req.user.id
+    })
+
+    if (!job) {
+      return res.status(404).json({
+        message: "Job not found"
+      })
+    }
+
+    res.status(200).json(job)
+
+  } catch (error) {
+
+    console.error("GET JOB ERROR:", error)
+
+    res.status(500).json({
+      message: error.message
+    })
+
+  }
+}
+
+
+// ============================
+// UPDATE JOB
+// ============================
+exports.updateJob = async (req, res) => {
+  try {
 
     const job = await Job.findOneAndUpdate(
       {
-        _id: id,
+        _id: req.params.id,
         createdBy: req.user.id
       },
       req.body,
@@ -108,31 +114,28 @@ exports.updateJob = async (req, res) => {
       })
     }
 
-    res.status(200).json({
-      job
-    })
+    res.status(200).json(job)
 
   } catch (error) {
+
+    console.error("UPDATE JOB ERROR:", error)
 
     res.status(500).json({
       message: error.message
     })
 
   }
-
 }
 
 
-
+// ============================
 // DELETE JOB
+// ============================
 exports.deleteJob = async (req, res) => {
-
   try {
 
-    const { id } = req.params
-
     const job = await Job.findOneAndDelete({
-      _id: id,
+      _id: req.params.id,
       createdBy: req.user.id
     })
 
@@ -148,84 +151,38 @@ exports.deleteJob = async (req, res) => {
 
   } catch (error) {
 
+    console.error("DELETE JOB ERROR:", error)
+
     res.status(500).json({
       message: error.message
     })
 
   }
-
 }
 
 
-
-// JOB STATS (DASHBOARD)
-exports.getJobStats = async (req, res) => {
-
+// ============================
+// JOB STATS
+// ============================
+exports.getStats = async (req, res) => {
   try {
 
-    const stats = await Job.aggregate([
-      {
-        $match: {
-          createdBy: new mongoose.Types.ObjectId(req.user.id)
-        }
-      },
-      {
-        $group: {
-          _id: "$status",
-          count: { $sum: 1 }
-        }
-      }
-    ])
+    const jobs = await Job.find({
+      createdBy: req.user.id
+    })
 
-    const statsObject = {
-      Applied: 0,
-      Interview: 0,
-      Declined: 0
+    const stats = {
+      applications: jobs.length,
+      interviews: jobs.filter(j => j.status === "interview").length,
+      offers: jobs.filter(j => j.status === "offer").length,
+      rejected: jobs.filter(j => j.status === "rejected").length
     }
 
-    stats.forEach(item => {
-      statsObject[item._id] = item.count
-    })
-
-    res.status(200).json({
-      stats: statsObject
-    })
+    res.status(200).json(stats)
 
   } catch (error) {
 
-    res.status(500).json({
-      message: error.message
-    })
-
-  }
-
-}
-exports.getMonthlyStats = async (req, res) => {
-  try {
-
-    const stats = await Job.aggregate([
-      {
-        $match: {
-          createdBy: new mongoose.Types.ObjectId(req.user.id)
-        }
-      },
-      {
-        $group: {
-          _id: {
-            year: { $year: "$createdAt" },
-            month: { $month: "$createdAt" }
-          },
-          count: { $sum: 1 }
-        }
-      },
-      {
-        $sort: { "_id.year": -1, "_id.month": -1 }
-      }
-    ])
-
-    res.status(200).json({ stats })
-
-  } catch (error) {
+    console.error("STATS ERROR:", error)
 
     res.status(500).json({
       message: error.message
