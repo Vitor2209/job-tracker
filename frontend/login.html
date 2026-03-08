@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobTrack – Login</title>
+    <meta name="description" content="Sign in to JobTrack to manage your job applications.">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="auth-body">
+    <div class="auth-container">
+        <div class="auth-card" id="authCard">
+            <!-- Login Form -->
+            <div class="auth-form-section" id="loginSection">
+                <div class="auth-logo">
+                    <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M8 12l2 2 4-4"/>
+                    </svg>
+                    <span class="logo-text">JobTrack</span>
+                </div>
+                <h2 class="auth-title">Welcome back</h2>
+                <p class="auth-subtitle">Sign in to your account to continue</p>
+
+                <div class="auth-alert" id="loginAlert" style="display:none;"></div>
+
+                <form id="loginForm" class="auth-form" novalidate>
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input type="email" id="loginEmail" placeholder="you@example.com" required autocomplete="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
+                    </div>
+                    <button type="submit" class="btn-primary btn-full" id="loginBtn">
+                        <span class="btn-text">Sign In</span>
+                        <span class="btn-loader" style="display:none;"></span>
+                    </button>
+                </form>
+
+                <p class="auth-switch">
+                    Don't have an account? <a href="#" id="showRegister">Create one</a>
+                </p>
+            </div>
+
+            <!-- Register Form -->
+            <div class="auth-form-section" id="registerSection" style="display:none;">
+                <div class="auth-logo">
+                    <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M8 12l2 2 4-4"/>
+                    </svg>
+                    <span class="logo-text">JobTrack</span>
+                </div>
+                <h2 class="auth-title">Create account</h2>
+                <p class="auth-subtitle">Start tracking your job applications</p>
+
+                <div class="auth-alert" id="registerAlert" style="display:none;"></div>
+
+                <form id="registerForm" class="auth-form" novalidate>
+                    <div class="form-group">
+                        <label for="regName">Full Name</label>
+                        <input type="text" id="regName" placeholder="John Doe" required autocomplete="name">
+                    </div>
+                    <div class="form-group">
+                        <label for="regEmail">Email</label>
+                        <input type="email" id="regEmail" placeholder="you@example.com" required autocomplete="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="regPassword">Password</label>
+                        <input type="password" id="regPassword" placeholder="Min. 6 characters" required minlength="6" autocomplete="new-password">
+                    </div>
+                    <button type="submit" class="btn-primary btn-full" id="registerBtn">
+                        <span class="btn-text">Create Account</span>
+                        <span class="btn-loader" style="display:none;"></span>
+                    </button>
+                </form>
+
+                <p class="auth-switch">
+                    Already have an account? <a href="#" id="showLogin">Sign in</a>
+                </p>
+            </div>
+        </div>
+
+        <p class="auth-footer">JobTrack &copy; 2026 — Track smarter, land faster.</p>
+    </div>
+
+    <script src="js/auth.js"></script>
+</body>
+</html>

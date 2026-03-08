@@ -1,104 +1,93 @@
-/**
- * JobTrack – API Layer
- * Connects frontend to Express backend
- */
-
-const API_URL = "http://localhost:5000/api"
-
-// COLE AQUI O TOKEN QUE VOCE PEGOU NO THUNDER CLIENT
-const TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YTk5ZTU4NWIxYTgxZWI3YmZkMzcwMiIsImlhdCI6MTc3MjgwODg0MiwiZXhwIjoxNzczNDEzNjQyfQ.l64PvBhbV43usmm8AxoXFuamf3Q36svFGUkuM4hLr5o"
+const BASE_URL = "http://localhost:5000"
 
 const API = {
 
-    // =============================
-    // GET ALL JOBS
-    // =============================
+  // pegar token salvo
+  getToken() {
+    return localStorage.getItem("token")
+  },
 
-    async getJobs() {
-
-        const res = await fetch(`${API_URL}/jobs`, {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${TOKEN}`
-            }
-        })
-
-        const data = await res.json()
-
-        return data.jobs
-
-    },
-
-    // =============================
-    // CREATE JOB
-    // =============================
-
-    async createJob(jobData) {
-
-        const res = await fetch(`${API_URL}/jobs`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${TOKEN}`
-            },
-            body: JSON.stringify(jobData)
-        })
-
-        return res.json()
-
-    },
-
-    // =============================
-    // UPDATE JOB
-    // =============================
-
-    async updateJob(id, jobData) {
-
-        const res = await fetch(`${API_URL}/jobs/${id}`, {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${TOKEN}`
-            },
-            body: JSON.stringify(jobData)
-        })
-
-        return res.json()
-
-    },
-
-    // =============================
-    // DELETE JOB
-    // =============================
-
-    async deleteJob(id) {
-
-        const res = await fetch(`${API_URL}/jobs/${id}`, {
-            method: "DELETE",
-            headers: {
-                "Authorization": `Bearer ${TOKEN}`
-            }
-        })
-
-        return res.json()
-
-    },
-
-    // =============================
-    // GET STATS
-    // =============================
-
-    async getStats() {
-
-        const res = await fetch(`${API_URL}/jobs/stats`, {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${TOKEN}`
-            }
-        })
-
-        return res.json()
-
+  // headers padrão
+  headers() {
+    return {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${this.getToken()}`
     }
+  },
+
+  // LOGIN (salva token automaticamente)
+  async login(email, password) {
+
+    const res = await fetch(`${BASE_URL}/api/auth/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ email, password })
+    })
+
+    const data = await res.json()
+
+    localStorage.setItem("token", data.token)
+
+    return data
+  },
+
+  // GET JOBS
+  async getJobs() {
+
+    const res = await fetch(`${BASE_URL}/api/jobs`, {
+      headers: this.headers()
+    })
+
+    const data = await res.json()
+
+    return data.jobs
+  },
+
+  // CREATE JOB
+  async createJob(job) {
+
+    const res = await fetch(`${BASE_URL}/api/jobs`, {
+      method: "POST",
+      headers: this.headers(),
+      body: JSON.stringify(job)
+    })
+
+    return res.json()
+  },
+
+  // UPDATE JOB
+  async updateJob(id, job) {
+
+    const res = await fetch(`${BASE_URL}/api/jobs/${id}`, {
+      method: "PATCH",
+      headers: this.headers(),
+      body: JSON.stringify(job)
+    })
+
+    return res.json()
+  },
+
+  // DELETE JOB
+  async deleteJob(id) {
+
+    const res = await fetch(`${BASE_URL}/api/jobs/${id}`, {
+      method: "DELETE",
+      headers: this.headers()
+    })
+
+    return res.json()
+  },
+
+  // STATS
+  async getStats() {
+
+    const res = await fetch(`${BASE_URL}/api/jobs/stats`, {
+      headers: this.headers()
+    })
+
+    return res.json()
+  }
 
 }
